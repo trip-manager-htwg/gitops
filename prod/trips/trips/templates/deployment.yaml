@@ -1,0 +1,83 @@
+---
+# Source: trips/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: trips
+  namespace: trip-manager-prod
+  labels:
+    app.kubernetes.io/name: trips
+    app.kubernetes.io/instance: trips
+    app.kubernetes.io/version: "sha-675b2d494a7486fd48d57c9a0876996645fb1262"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: trip-manager
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: trips
+      app.kubernetes.io/instance: trips
+  template:
+    metadata:
+      labels: 
+        app.kubernetes.io/name: trips
+        app.kubernetes.io/instance: trips
+      annotations:
+        checksum/config: 164939a1410f3682c5211e85bd20eb0e7680f03e8d3e036e0ff16e9f8057f7b6
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: trips
+          image: "ghcr.io/trip-manager-htwg/backend/trips:sha-675b2d494a7486fd48d57c9a0876996645fb1262"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8084
+              name: http
+              protocol: TCP
+          env: 
+            - name: PORT
+              value: "8084"
+            - name: LOG_LEVEL
+              value: info
+            - name: AUTH_SERVICE_URL
+              value: http://auth.trip-manager-prod.svc.cluster.local:8082
+            - name: USERS_SERVICE_URL
+              value: http://users.trip-manager-prod.svc.cluster.local:8083
+            - name: GCP_PROJECT_ID
+              value: ornate-reef-501614-a1
+            - name: PUBSUB_TOPIC_ID
+              value: trip-events
+            - name: CORS_ALLOWED_ORIGINS
+              value: https://neatnode.xyz,https://www.neatnode.xyz
+            - name: OTEL_COLLECTOR_ENDPOINT
+              value: otel-collector.trip-manager-prod.svc.cluster.local:4317
+            - name: S3_ENDPOINT
+              value: https://storage.googleapis.com
+            - name: S3_BUCKET
+              value: ornate-reef-501614-a1-trip-manager-bucket
+          envFrom: 
+            - secretRef:
+                name: trips-secrets
+          resources: 
+            limits:
+              cpu: 500m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+      serviceAccountName: trips

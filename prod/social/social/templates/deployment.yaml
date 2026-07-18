@@ -1,0 +1,86 @@
+---
+# Source: social/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: social
+  namespace: trip-manager-prod
+  labels:
+    app.kubernetes.io/name: social
+    app.kubernetes.io/instance: social
+    app.kubernetes.io/version: "sha-675b2d494a7486fd48d57c9a0876996645fb1262"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: trip-manager
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: social
+      app.kubernetes.io/instance: social
+  template:
+    metadata:
+      labels: 
+        app.kubernetes.io/name: social
+        app.kubernetes.io/instance: social
+      annotations:
+        checksum/config: 8e1f2ff356f8d53042f9e8b460f03110a1f2407f5e4233d9a34cd29577dd61b4
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: social
+          image: "ghcr.io/trip-manager-htwg/backend/social:sha-675b2d494a7486fd48d57c9a0876996645fb1262"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8081
+              name: http
+              protocol: TCP
+          env: 
+            - name: PORT
+              value: "8081"
+            - name: LOG_LEVEL
+              value: info
+            - name: FIRESTORE_PROJECT_ID
+              value: ornate-reef-501614-a1
+            - name: AUTH_CLIENT_CONNECTION_STRING
+              value: http://auth.trip-manager-prod.svc.cluster.local:8082
+            - name: USERS_SERVICE_URL
+              value: http://users.trip-manager-prod.svc.cluster.local:8083
+            - name: GCP_PROJECT_ID
+              value: ornate-reef-501614-a1
+            - name: PUBSUB_TOPIC_ID
+              value: trip-events
+            - name: CORS_ALLOWED_ORIGINS
+              value: https://neatnode.xyz,https://www.neatnode.xyz
+            - name: OTEL_COLLECTOR_ENDPOINT
+              value: otel-collector.trip-manager-prod.svc.cluster.local:4317
+            - name: STORAGE_PROVIDER
+              value: gcs
+            - name: STORAGE_BUCKET
+              value: ornate-reef-501614-a1-trip-manager-bucket
+            - name: AUTH_SERVICE_URL
+              value: http://auth.trip-manager-prod.svc.cluster.local:8082
+            - name: GCS_SIGNER_SA
+              value: social-sa@ornate-reef-501614-a1.iam.gserviceaccount.com
+          resources: 
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 50m
+              memory: 64Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+      serviceAccountName: social

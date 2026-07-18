@@ -1,0 +1,84 @@
+---
+# Source: users/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: users
+  namespace: trip-manager-prod
+  labels:
+    app.kubernetes.io/name: users
+    app.kubernetes.io/instance: users
+    app.kubernetes.io/version: "sha-675b2d494a7486fd48d57c9a0876996645fb1262"
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/part-of: trip-manager
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: users
+      app.kubernetes.io/instance: users
+  template:
+    metadata:
+      labels: 
+        app.kubernetes.io/name: users
+        app.kubernetes.io/instance: users
+      annotations:
+        checksum/config: d51c627e61f2eef70d152bc2f37d5850ca889099d66d4cd0fbe366edfc93c49f
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+      containers:
+        - name: users
+          image: "ghcr.io/trip-manager-htwg/backend/users:sha-675b2d494a7486fd48d57c9a0876996645fb1262"
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8083
+              name: http
+              protocol: TCP
+          env: 
+            - name: PORT
+              value: "8083"
+            - name: LOG_LEVEL
+              value: info
+            - name: AUTH_SERVICE_URL
+              value: http://auth.trip-manager-prod.svc.cluster.local:8082
+            - name: STORAGE_BUCKET_URL
+              value: https://storage.googleapis.com/ornate-reef-501614-a1-trip-manager-bucket
+            - name: CORS_ALLOWED_ORIGINS
+              value: https://neatnode.xyz,https://www.neatnode.xyz
+            - name: OTEL_COLLECTOR_ENDPOINT
+              value: otel-collector.trip-manager-prod.svc.cluster.local:4317
+            - name: GCP_PROJECT_ID
+              value: ornate-reef-501614-a1
+            - name: GITHUB_REPO
+              value: trip-manager-htwg/application
+            - name: GITHUB_BRANCH
+              value: main
+            - name: BASE_URL
+              value: https://www.neatnode.xyz
+          envFrom: 
+            - secretRef:
+                name: users-secrets
+          resources: 
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 100m
+              memory: 64Mi
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            failureThreshold: 3
+      serviceAccountName: users
