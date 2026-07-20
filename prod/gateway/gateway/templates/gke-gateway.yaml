@@ -6,7 +6,7 @@ metadata:
   name: trip-manager-gateway
   namespace: trip-manager-prod
   annotations:
-    networking.gke.io/certmap: "trip-manager-cert-map"
+    networking.gke.io/certmap: "trip-manager-prod-cert-map"
 spec:
   gatewayClassName: gke-l7-global-external-managed
   listeners:
