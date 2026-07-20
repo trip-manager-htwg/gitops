@@ -7,6 +7,7 @@ metadata:
   namespace: trip-manager-prod
   annotations:
     networking.gke.io/certmap: "trip-manager-prod-cert-map"
+    networking.gke.io/load-balancer-ip: "34.111.234.48"
 spec:
   gatewayClassName: gke-l7-global-external-managed
   listeners:
