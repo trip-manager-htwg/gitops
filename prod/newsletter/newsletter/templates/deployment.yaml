@@ -8,7 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: newsletter
     app.kubernetes.io/instance: newsletter
-    app.kubernetes.io/version: "sha-48f1a871c76e03e4dec7cc5e4a494e925c4573d1"
+    app.kubernetes.io/version: "sha-4834615eb48f16c42bda633a617a899871403fbc"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: trip-manager
 spec:
@@ -24,12 +24,14 @@ spec:
       annotations:
         checksum/config: 63b6ce2195f32c1563605c50c52f434957120e47529c906b5727c05fb549c265
     spec:
+      imagePullSecrets: 
+        - name: '[map[name:ghcr-secret]]'
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
         - name: newsletter
-          image: "ghcr.io/trip-manager-htwg/backend/newsletter:sha-48f1a871c76e03e4dec7cc5e4a494e925c4573d1"
+          image: "ghcr.io/trip-manager-htwg/backend/newsletter:sha-4834615eb48f16c42bda633a617a899871403fbc"
           imagePullPolicy: Always
           ports:
             - containerPort: 8070

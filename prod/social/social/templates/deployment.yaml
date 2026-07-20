@@ -8,7 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: social
     app.kubernetes.io/instance: social
-    app.kubernetes.io/version: "sha-48f1a871c76e03e4dec7cc5e4a494e925c4573d1"
+    app.kubernetes.io/version: "sha-4834615eb48f16c42bda633a617a899871403fbc"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: trip-manager
 spec:
@@ -24,12 +24,14 @@ spec:
       annotations:
         checksum/config: 8e1f2ff356f8d53042f9e8b460f03110a1f2407f5e4233d9a34cd29577dd61b4
     spec:
+      imagePullSecrets: 
+        - name: '[map[name:ghcr-secret]]'
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
         - name: social
-          image: "ghcr.io/trip-manager-htwg/backend/social:sha-48f1a871c76e03e4dec7cc5e4a494e925c4573d1"
+          image: "ghcr.io/trip-manager-htwg/backend/social:sha-4834615eb48f16c42bda633a617a899871403fbc"
           imagePullPolicy: Always
           ports:
             - containerPort: 8081
