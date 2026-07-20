@@ -8,7 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: trips
     app.kubernetes.io/instance: trips
-    app.kubernetes.io/version: "sha-a0519ce51dd53783fc96f441210d9691f75ca530"
+    app.kubernetes.io/version: "sha-e9516e25932bb6fc794f072a017d5d80122f199b"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: trip-manager
 spec:
@@ -31,7 +31,7 @@ spec:
         runAsUser: 1000
       containers:
         - name: trips
-          image: "ghcr.io/trip-manager-htwg/backend/trips:sha-a0519ce51dd53783fc96f441210d9691f75ca530"
+          image: "ghcr.io/trip-manager-htwg/backend/trips:sha-e9516e25932bb6fc794f072a017d5d80122f199b"
           imagePullPolicy: Always
           ports:
             - containerPort: 8084
