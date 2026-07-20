@@ -8,7 +8,7 @@ metadata:
   labels:
     app.kubernetes.io/name: travel-info
     app.kubernetes.io/instance: travel-info
-    app.kubernetes.io/version: "sha-e9516e25932bb6fc794f072a017d5d80122f199b"
+    app.kubernetes.io/version: "sha-d90b2a6ad17c714fd268254b309ba6318e4a6a1d"
     app.kubernetes.io/managed-by: Helm
     app.kubernetes.io/part-of: trip-manager
 spec:
@@ -26,13 +26,13 @@ spec:
         checksum/config: 55b3a70ee53218c140703118564892564dd4a5cf426ad1e0e1b04d49e2964cc7
     spec:
       imagePullSecrets: 
-        - name: '[map[name:ghcr-secret]]'
+        - name: ghcr-secret
       securityContext:
         runAsNonRoot: true
         runAsUser: 1000
       containers:
         - name: travel-info
-          image: "ghcr.io/trip-manager-htwg/backend/travel-info:sha-e9516e25932bb6fc794f072a017d5d80122f199b"
+          image: "ghcr.io/trip-manager-htwg/backend/travel-info:sha-d90b2a6ad17c714fd268254b309ba6318e4a6a1d"
           imagePullPolicy: Always
           ports:
             - containerPort: 8087
